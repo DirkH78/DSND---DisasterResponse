@@ -22,6 +22,15 @@ nltk.download('stopwords')
 nltk.download('wordnet')
 
 def load_data(database_filepath):
+    '''
+    INPUT:
+    database_filepath - filepath to the data base with clean data
+    
+    OUTPUT:
+    X - pandas DataFrame with model input data
+    Y - pandas DataFrame with model response data
+    column names - column names for response data
+    '''
     # load data from database
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql('SELECT * FROM DisasterResponse_DataFrame', engine)
@@ -31,7 +40,13 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-
+    '''
+    INPUT:
+    text - text extracted from a database row
+    
+    OUTPUT:
+    tokens - list with all text tokens
+    '''
     # tokenize text
     tokens = word_tokenize(text)
     
@@ -54,6 +69,10 @@ def tokenize(text):
 
 
 def build_model():
+    '''    
+    OUTPUT:
+    model - a model which has been optimized for the global task by using GridSearchCV
+    '''
     # build pipeline
     forest = RandomForestClassifier(n_estimators = 50, random_state = 1) 
     pipeline = Pipeline([
@@ -82,6 +101,13 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    INPUT:
+    model - model to be evaluated
+    X_test - test input data for evaluation
+    Y_test - test response data for evaluation
+    category_names - column names for response data
+    '''
     for i, column in enumerate(category_names):
         print('Test results for "' + column + '" :\n')
         print(classification_report(Y_test[column], pd.DataFrame(model.predict(X_test))[i]))
@@ -89,6 +115,11 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    INPUT:
+    model - model to be saved as pkl
+    model_filepath - filepath and model file name 
+    '''
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
